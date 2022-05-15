@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Surrogate Pair Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <style>
+      body {
+        padding: 16px;
+        font-family: monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <h2>H,L => S</h2>
+      \u<input v-model="h" placeholder="H" />
+      <br />
+      \u<input v-model="l" placeholder="L" />
+      <br />
+      S: \u{{ S }} {{ SDisplay }}
+      <h2>S => H,L</h2>
+      \u<input v-model="s" placeholder="s" />
+      <br />
+      H,L: \u{{ H }}\u{{ L }} {{ HLDisplay }}
+    </div>
+    <script>
+      var app = new Vue({
+        el: "#app",
+        data: {
+          h: "d83d",
+          l: "de03",
+          s: "1f603",
+        },
+        computed: {
+          S: function () {
+            if (!this.h || !this.l) return "";
+            return this.codeDisplay(
+              (`0x${this.h}` - 0xd800) * 0x400 +
+                (`0x${this.l}` - 0xdc00 + 0x10000)
+            );
+          },
+          SDisplay: function () {
+            return this.originalStrDisplay(this.h, this.l);
+          },
+          H: function () {
+            if (!this.s) return "";
+            return this.codeDisplay(
+              Math.floor((`0x${this.s}` - 0x10000) / 0x400) + 0xd800
+            );
+          },
+          L: function () {
+            if (!this.s) return "";
+            return this.codeDisplay(
+              ((`0x${this.s}` - 0x10000) % 0x400) + 0xdc00
+            );
+          },
+          HLDisplay: function () {
+            return this.originalStrDisplay(this.H, this.L);
+          },
+        },
+        methods: {
+          originalStrDisplay: (h, l) => String.fromCharCode(`0x${h}`, `0x${l}`),
+          codeDisplay: (code) => code.toString(16).toUpperCase(),
+        },
+      });
+    </script>
+  </body>
+</html>
